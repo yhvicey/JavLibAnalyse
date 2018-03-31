@@ -49,10 +49,9 @@ namespace Crawler
                 Image<Rgba32> image = null;
                 try
                 {
-                    var imageNode = root?.GetChildElementById("video_jacket_img");
-                    var imgUrl = new Uri($"{Config.RootUrl}/{imageNode.GetAttributeValue("src", "../img/noimagepl.gif")}");
-                    if (imgUrl.Segments.Last() != "noimagepl.gif")
-                        image = Image.Load(Utils.GetResponseByteContent(imgUrl));
+                    var idInUrl = id.Replace("-", "").ToLower();
+                    var imageUrl = new Uri($"http://pics.dmm.co.jp/mono/movie/adult/{idInUrl}so/{idInUrl}sopl.jpg");
+                    image = Image.Load(Utils.GetResponseByteContent(imageUrl, url.ToString()));
                 }
                 catch (Exception ex)
                 {

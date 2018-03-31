@@ -31,7 +31,7 @@ namespace Crawler
 
                 LogDir = config["logDir"]?.Value<string>() ?? $"log";
                 OutputDir = config["outputDir"]?.Value<string>() ?? $"data";
-                TempDir = config["outputDir"]?.Value<string>() ?? $"temp";
+                TempDir = config["tempDir"]?.Value<string>() ?? $"temp";
 
                 if (!Directory.Exists(LogDir)) Directory.CreateDirectory(LogDir);
                 if (!Directory.Exists(OutputDir)) Directory.CreateDirectory(OutputDir);
