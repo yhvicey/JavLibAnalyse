@@ -1,0 +1,7 @@
+# Folders
+.vs/
+.vscode/
+bin/
+data/
+log/
+obj/
