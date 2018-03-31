@@ -39,6 +39,8 @@ namespace Crawler
         {
             var task = ProcessorTasks.Take();
             ProcessorTaskHistory.Add(task);
+            if (++CheckpointCounter > Config.CheckpointThreshold)
+                Checkpoint();
             return task;
         }
 
@@ -80,6 +82,7 @@ namespace Crawler
 
         private static void Checkpoint()
         {
+            CheckpointCounter = 0;
             var checkpointFilePath = $"{Config.TempDir}/checkpoint_{DateTime.Now:yyyy_MM_dd_HH_mm_ss_ffff}.chkpnt";
             try
             {
