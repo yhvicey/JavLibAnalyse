@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace Crawler
     {
         static void Main(string[] args)
         {
-            SetMaxThreadCount(Config.ProcessorCount + Config.ProducerCount);
+            SetMaxThreadCount(Config.MaxThreadCount);
 
             var producerTasks = LaunchThreads(Config.ProducerCount, ProducerMainProc);
             var processorTasks = LaunchThreads(Config.ProcessorCount, ProcessorMainProc);
@@ -34,33 +35,31 @@ namespace Crawler
                 Dispatcher.AddProducerTask(genres, 1);
             }
             var random = new Random(Guid.NewGuid().GetHashCode());
-            while (!Dispatcher.IsProcessorTaskCompleted)
+            while (true)
             {
-                //Thread.Sleep(random.Next(Config.MinRequestInterval * 1000, Config.MaxRequestInterval * 1000));
                 var (genres, page) = Dispatcher.GetProducerTask();
                 Producer.Produce(genres, page);
+                Thread.Sleep(random.Next(Config.MinRequestInterval * 1000, Config.MaxRequestInterval * 1000));
             }
         }
 
         private static void ProcessorMainProc()
         {
             var random = new Random(Guid.NewGuid().GetHashCode());
-            while (!Dispatcher.IsProcessorTaskCompleted)
+            while (true)
             {
-                //Thread.Sleep(random.Next(Config.MinRequestInterval * 1000, Config.MaxRequestInterval * 1000));
                 var task = Dispatcher.GetProcessorTask();
                 var result = Processor.Process(task);
                 if (result == null)
                     continue;
                 if (Saver.Save(task, result))
                     Dispatcher.FinishProcessorTask(task);
+                Thread.Sleep(random.Next(Config.MinRequestInterval * 1000, Config.MaxRequestInterval * 1000));
             }
         }
 
         private static void SetMaxThreadCount(int maxThreadCount)
         {
-            ThreadPool.GetMinThreads(out var minWorkerThreadCount, out var minIOThreadCount);
-            maxThreadCount = Math.Max(Math.Max(minWorkerThreadCount, minIOThreadCount), maxThreadCount);
             ThreadPool.SetMaxThreads(maxThreadCount, maxThreadCount);
         }
     }

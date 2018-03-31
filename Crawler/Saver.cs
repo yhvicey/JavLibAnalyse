@@ -20,6 +20,8 @@ namespace Crawler
 
                 var metadata = new JObject
                 {
+                    ["vid"] = result.VId,
+                    ["title"] = result.Title,
                     ["id"] = result.Identifier,
                     ["date"] = result.Date,
                     ["length"] = result.Length,

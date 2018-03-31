@@ -10,8 +10,10 @@ namespace Crawler
         public static int CheckpointThreshold { get; }
         public static string Genres { get; }
         public static int MaxRequestInterval { get; }
+        public static int MaxThreadCount { get; }
         public static int MinRequestInterval { get; }
         public static string LogDir { get; }
+        public static LogLevel LogLevel { get; }
         public static string OutputDir { get; }
         public static int ProcessorCount { get; }
         public static int ProducerCount { get; }
@@ -39,8 +41,10 @@ namespace Crawler
                     throw new Exception("Missing genres in config file!");
 
                 CheckpointThreshold = config["checkpointThreshold"]?.Value<int>() ?? 100;
+                LogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), config["logLevel"]?.Value<string>() ?? "info", true);
                 ProcessorCount = config["processorCount"]?.Value<int>() ?? 4;
                 MaxRequestInterval = config["maxRequestInterval"]?.Value<int>() ?? 300;
+                MaxThreadCount = config["maxThreadCount"]?.Value<int>() ?? 65535;
                 MinRequestInterval = config["minRequestInterval"]?.Value<int>() ?? 60;
                 ProducerCount = config["producerCount"]?.Value<int>() ?? 4;
                 RootUrl = config["rootUrl"]?.Value<string>() ?? "http://www.19lib.com/cn";

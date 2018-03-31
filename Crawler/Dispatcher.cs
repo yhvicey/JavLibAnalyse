@@ -35,11 +35,25 @@ namespace Crawler
             }
         }
 
-        public static void FinishProducerTask(string genres, int page) => ProducerTaskHistory.Add((genres, page));
+        public static string GetProcessorTask()
+        {
+            var task = ProcessorTasks.Take();
+            ProcessorTaskHistory.Add(task);
+            return task;
+        }
 
-        public static string GetProcessorTask() => ProcessorTasks.Take();
+        public static (string Genres, int Page) GetProducerTask()
+        {
+            var task = ProducerTasks.Take();
+            ProducerTaskHistory.Add(task);
+            return task;
+        }
 
-        public static (string Genres, int Page) GetProducerTask() => ProducerTasks.Take();
+        public static void ReAddProcessorTask(string id)
+            => ProcessorTasks.Add(id);
+
+        public static void ReAddProducerTask(string genres, int page)
+            => ProducerTasks.Add((genres, page));
 
         private static int CheckpointCounter = 0;
         private static readonly HashSet<string> ProcessorTaskHistory = new HashSet<string>();

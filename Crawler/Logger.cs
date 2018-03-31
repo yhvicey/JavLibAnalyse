@@ -55,6 +55,15 @@ namespace Crawler
 
         private static readonly object SyncLock = new object();
 
+        static Logger()
+        {
+            if (!File.Exists(LogFilePath)) return;
+            var i = 0;
+            while (File.Exists($"{LogFilePath}.{i}"))
+                i++;
+            File.Move(LogFilePath, $"{LogFilePath}.{i}");
+        }
+
         private static string FormatMessage(LogLevel logLevel, string message) => $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}][{logLevel}] {message}";
 
         private static void Log(params string[] message)
