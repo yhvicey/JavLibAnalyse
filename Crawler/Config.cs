@@ -6,7 +6,7 @@ namespace Crawler
 {
     public static class Config
     {
-        public static int CheckpointThreshold { get; }
+        public static int CheckpointInterval { get; }
         public static bool DownloadImage { get; }
         public static string Genres { get; }
         public static int InfoTimerInterval { get; }
@@ -24,7 +24,7 @@ namespace Crawler
         public static void PrintConfig()
         {
             Logger.Info($"========== Config Start ==========");
-            Logger.Info($"CheckpointThreshold:  {CheckpointThreshold}");
+            Logger.Info($"CheckpointInterval:   {CheckpointInterval}");
             Logger.Info($"DownloadImage:        {DownloadImage}");
             Logger.Info($"Genres:               {Genres}");
             Logger.Info($"InfoTimerInterval:    {InfoTimerInterval}");
@@ -61,7 +61,7 @@ namespace Crawler
                 Genres = config["genres"]?.Value<string>() ??
                     throw new Exception("Missing genres in config file!");
 
-                CheckpointThreshold = config["checkpointThreshold"]?.Value<int>() ?? 100;
+                CheckpointInterval = config["checkpointThreshold"]?.Value<int>() ?? 100;
                 DownloadImage = config["downloadImage"]?.Value<bool>() ?? false;
                 InfoTimerInterval = config["infoTimerInterval"]?.Value<int>() ?? 60;
                 LogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), config["logLevel"]?.Value<string>() ?? "info", true);

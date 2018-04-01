@@ -14,7 +14,8 @@ namespace Crawler
             SetMaxThreadCount(Config.MaxThreadCount);
 
             Config.PrintConfig();
-            var timer = LaunchInfoTimer();
+            var checkpointTimer = LaunchCheckpointTimer();
+            var infoTimer = LaunchInfoTimer();
 
             foreach (var genres in Config.Genres.Split(";"))
             {
@@ -31,6 +32,15 @@ namespace Crawler
         }
 
         private static CancellationTokenSource _cancelTokenSource = new CancellationTokenSource();
+
+        private static Timer LaunchCheckpointTimer()
+        {
+            return new Timer(state =>
+            {
+                if (Dispatcher.Checkpoint())
+                    Logger.Info($"Checkpoint finished successfully.");
+            }, null, 0, Config.CheckpointInterval * 1000);
+        }
 
         private static Timer LaunchInfoTimer()
         {
@@ -60,8 +70,11 @@ namespace Crawler
             while (!_cancelTokenSource.IsCancellationRequested)
             {
                 var (genres, page) = Dispatcher.GetProducerTask();
+                if (Dispatcher.IsProducerTaskFinished(genres, page))
+                    continue;
+
                 if (Producer.Produce(genres, page))
-                    Logger.Info($"Producer task ({genres}, {page}) finished successful.");
+                    Logger.Info($"Producer task ({genres}, {page}) finished successfully.");
                 Thread.Sleep(random.Next(Config.MinRequestInterval * 1000, Config.MaxRequestInterval * 1000));
             }
         }
@@ -72,8 +85,11 @@ namespace Crawler
             while (!_cancelTokenSource.IsCancellationRequested)
             {
                 var task = Dispatcher.GetProcessorTask();
+                if (Dispatcher.IsProcessorTaskFinished(task))
+                    continue;
+
                 if (Processor.Process(task))
-                    Logger.Info($"Processor task {task} finished successful.");
+                    Logger.Info($"Processor task {task} finished successfully.");
                 Thread.Sleep(random.Next(Config.MinRequestInterval * 1000, Config.MaxRequestInterval * 1000));
             }
         }
