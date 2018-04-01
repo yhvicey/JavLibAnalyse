@@ -15,7 +15,7 @@ namespace Crawler
                 var content = Utils.GetResponseContent(url);
                 if (content == null)
                 {
-                    Dispatcher.ReAddProcessorTask(task);
+                    Dispatcher.AddProcessorTask(task);
                     return false;
                 }
 
@@ -72,7 +72,7 @@ namespace Crawler
                 if (Saver.Save(result))
                     return true;
 
-                Dispatcher.ReAddProcessorTask(task);
+                Dispatcher.AddProcessorTask(task);
                 return false;
             }
             catch (Exception ex)

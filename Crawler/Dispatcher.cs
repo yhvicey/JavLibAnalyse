@@ -90,12 +90,6 @@ namespace Crawler
             Logger.Info($"==================================");
         }
 
-        public static void ReAddProcessorTask(string id)
-            => ProcessorTasks.Add(id);
-
-        public static void ReAddProducerTask(string genres, int page)
-            => ProducerTasks.Add((genres, page));
-
         private static readonly object ProcessorSyncLock = new object();
         private static readonly BlockingCollection<string> ProcessorTasks = new BlockingCollection<string>();
         private static readonly object ProducerSyncLock = new object();

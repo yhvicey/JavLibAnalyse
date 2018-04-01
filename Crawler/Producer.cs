@@ -14,7 +14,7 @@ namespace Crawler
                 var content = Utils.GetResponseContent(url);
                 if (content == null)
                 {
-                    Dispatcher.ReAddProducerTask(genres, page);
+                    Dispatcher.AddProducerTask(genres, page);
                     return false;
                 }
 
@@ -42,7 +42,7 @@ namespace Crawler
             catch (Exception ex)
             {
                 Logger.Error($"Error occured while producing. Genres: {genres}, Page: {page}.", ex);
-                Dispatcher.ReAddProducerTask(genres, page);
+                Dispatcher.AddProducerTask(genres, page);
                 return false;
             }
         }
