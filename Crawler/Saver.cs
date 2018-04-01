@@ -7,9 +7,11 @@ namespace Crawler
 {
     public static class Saver
     {
-        public static bool Save(string id, Result result)
+        public static bool Save(Result result)
         {
-            var resultDir = $"{Config.OutputDir}/{id}";
+            if (string.IsNullOrWhiteSpace(result?.VId)) throw new ArgumentException(nameof(result), "Invalid result.");
+
+            var resultDir = $"{Config.OutputDir}/{result.VId}";
             try
             {
                 if (Directory.Exists(resultDir))
@@ -52,7 +54,7 @@ namespace Crawler
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to save result. Id: {id}, result dir: {resultDir}.", ex);
+                Logger.Error($"Failed to save result. Id: {result.VId}, result dir: {resultDir}.", ex);
                 return false;
             }
         }

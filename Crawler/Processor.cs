@@ -1,19 +1,13 @@
 using System;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using HtmlAgilityPack;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace Crawler
 {
     public static class Processor
     {
-        public static Result Process(string task)
+        public static bool Process(string task)
         {
             try
             {
@@ -22,7 +16,7 @@ namespace Crawler
                 if (content == null)
                 {
                     Dispatcher.ReAddProcessorTask(task);
-                    return null;
+                    return false;
                 }
 
                 var doc = new HtmlDocument();
@@ -45,20 +39,7 @@ namespace Crawler
                 var genres = videoInfoNode?.GetChildElementById("video_genres")?.GetChildElements("table/tr/td/span/a")?.Select(node => node.InnerText);
                 var cast = videoInfoNode?.GetChildElementById("video_cast")?.GetChildElements("table/tr/td/span/span/a")?.Select(node => node.InnerText);
 
-                // Get image
-                Image<Rgba32> image = null;
-                try
-                {
-                    var idInUrl = id.Replace("-", "").ToLower();
-                    var imageUrl = new Uri($"http://pics.dmm.co.jp/mono/movie/adult/{idInUrl}so/{idInUrl}sopl.jpg");
-                    image = Image.Load(Utils.GetResponseByteContent(imageUrl, url.ToString()));
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"Failed to get image. Task: {task}", ex);
-                }
-
-                return new Result
+                var result = new Result
                 {
                     VId = task,
                     Title = title,
@@ -71,13 +52,33 @@ namespace Crawler
                     Review = string.IsNullOrWhiteSpace(review) ? 0 : double.Parse(review.Trim('(', ')')),
                     Genres = genres == null ? null : string.Join(";", genres),
                     Cast = cast == null ? null : string.Join(";", cast),
-                    Image = image
                 };
+
+                // Get image
+                if (Config.DownloadImage)
+                {
+                    try
+                    {
+                        var idInUrl = id.Replace("-", "").ToLower();
+                        var imageUrl = new Uri($"http://pics.dmm.co.jp/mono/movie/adult/{idInUrl}so/{idInUrl}sopl.jpg");
+                        result.Image = Image.Load(Utils.GetResponseByteContent(imageUrl, url.ToString()));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to get image. Task: {task}", ex);
+                    }
+                }
+
+                if (Saver.Save(result))
+                    return true;
+
+                Dispatcher.ReAddProcessorTask(task);
+                return false;
             }
             catch (Exception ex)
             {
                 Logger.Error($"Error occured while processing. Task: {task}", ex);
-                return null;
+                return false;
             }
         }
     }

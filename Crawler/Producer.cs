@@ -6,7 +6,7 @@ namespace Crawler
 {
     public static class Producer
     {
-        public static void Produce(string genres, int page)
+        public static bool Produce(string genres, int page)
         {
             try
             {
@@ -15,7 +15,7 @@ namespace Crawler
                 if (content == null)
                 {
                     Dispatcher.ReAddProducerTask(genres, page);
-                    return;
+                    return false;
                 }
 
                 var doc = new HtmlDocument();
@@ -24,20 +24,32 @@ namespace Crawler
 
                 // Get video list
                 var videosNode = root?.GetChildElement("//*[@class='videos']");
-                if (videosNode == null) return;
+                if (videosNode == null)
+                {
+                    Dispatcher.FinishProducerTask(genres, page);
+                    return true;
+                }
                 var videoList = videosNode?.GetChildElements("div[@class='video']")
                     ?.Select(node => node.GetAttributeValue("id", null))
                     ?.Where(id => id != null)
                     ?.Select(id => id.Remove(0, 4));
-                if (videoList == null) return;
+                if (videoList == null)
+                {
+                    Dispatcher.FinishProducerTask(genres, page);
+                    return true;
+                }
                 foreach (var id in videoList)
                     Dispatcher.AddProcessorTask(id);
+
+                Dispatcher.FinishProducerTask(genres, page);
                 Dispatcher.AddProducerTask(genres, page + 1);
+                return true;
             }
             catch (Exception ex)
             {
                 Logger.Error($"Error occured while producing. Genres: {genres}, Page: {page}.", ex);
                 Dispatcher.ReAddProducerTask(genres, page);
+                return false;
             }
         }
     }

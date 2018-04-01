@@ -1,54 +1,58 @@
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Crawler
 {
     public static class Dispatcher
     {
-        public static bool IsProcessorTaskCompleted => ProcessorTasks.IsCompleted;
-        public static bool IsProducerTaskCompleted => ProducerTasks.IsCompleted;
+        public static bool IsComplete => ProducerTasks.Count == 0 && ProcessorTasks.Count == 0;
 
         public static void AddProcessorTask(string id)
         {
-            if (ProcessorTaskHistory.Contains(id))
-                return;
-            ProcessorTasks.Add(id);
+            lock (ProcessorSyncLock)
+            {
+                if (IsProcessorTaskFinished(id))
+                    return;
+                ProcessorTasks.Add(id);
+            }
         }
 
         public static void AddProducerTask(string genres, int page)
         {
-            if (ProducerTaskHistory.Contains((genres, page)))
-                return;
-            ProducerTasks.Add((genres, page));
+            lock (ProducerSyncLock)
+            {
+                if (ProducerTaskHistory.Contains((genres, page)))
+                    return;
+                ProducerTasks.Add((genres, page));
+            }
         }
 
-        public static void FinishProcessorTask(string id)
+        public static void FinishProducerTask(string genres, int page)
         {
-            ProcessorTaskHistory.Add(id);
-            if (++CheckpointCounter >= Config.CheckpointThreshold)
+            lock (ProducerSyncLock)
             {
-                Checkpoint();
-                CheckpointCounter = 0;
+                ProducerTaskHistory.Add((genres, page));
             }
         }
 
         public static string GetProcessorTask()
-        {
-            var task = ProcessorTasks.Take();
-            ProcessorTaskHistory.Add(task);
-            if (++CheckpointCounter > Config.CheckpointThreshold)
-                Checkpoint();
-            return task;
-        }
+            => ProcessorTasks.Take();
 
         public static (string Genres, int Page) GetProducerTask()
+            => ProducerTasks.Take();
+
+        public static bool IsProcessorTaskFinished(string task)
+            => Directory.Exists($"{Config.OutputDir}/{task}");
+
+        public static void PrintInfo()
         {
-            var task = ProducerTasks.Take();
-            ProducerTaskHistory.Add(task);
-            return task;
+            Logger.Info($"========== Current Info ==========");
+            Logger.Info($"Processor task count:             {ProcessorTasks.Count}");
+            Logger.Info($"Producer task count:              {ProducerTasks.Count}");
+            Logger.Info($"Finished processor task count:    {Directory.GetDirectories(Config.OutputDir).Length}");
+            Logger.Info($"Finished producer task count:     {ProducerTaskHistory.Count}");
+            Logger.Info($"==================================");
         }
 
         public static void ReAddProcessorTask(string id)
@@ -57,41 +61,10 @@ namespace Crawler
         public static void ReAddProducerTask(string genres, int page)
             => ProducerTasks.Add((genres, page));
 
-        private static int CheckpointCounter = 0;
-        private static readonly HashSet<string> ProcessorTaskHistory = new HashSet<string>();
-        private static readonly HashSet<(string, int)> ProducerTaskHistory = new HashSet<(string, int)>();
+        private static readonly object ProcessorSyncLock = new object();
         private static readonly BlockingCollection<string> ProcessorTasks = new BlockingCollection<string>();
+        private static readonly object ProducerSyncLock = new object();
+        private static readonly HashSet<(string, int)> ProducerTaskHistory = new HashSet<(string, int)>();
         private static readonly BlockingCollection<(string, int)> ProducerTasks = new BlockingCollection<(string, int)>();
-
-        static Dispatcher()
-        {
-            var checkpointFiles = Directory.GetFiles(Config.TempDir, "checkpoint_*.chkpnt").ToList();
-            if (checkpointFiles.Count == 0) return;
-            checkpointFiles.Sort();
-            var checkpointFile = checkpointFiles.Last();
-            try
-            {
-                foreach (var id in File.ReadAllLines(checkpointFile))
-                    ProcessorTaskHistory.Add(id);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to load checkpoint file. File path: {checkpointFile}.", ex);
-            }
-        }
-
-        private static void Checkpoint()
-        {
-            CheckpointCounter = 0;
-            var checkpointFilePath = $"{Config.TempDir}/checkpoint_{DateTime.Now:yyyy_MM_dd_HH_mm_ss_ffff}.chkpnt";
-            try
-            {
-                File.WriteAllLines(checkpointFilePath, ProcessorTaskHistory);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to create checkpoint file. File path: {checkpointFilePath}.", ex);
-            }
-        }
     }
 }

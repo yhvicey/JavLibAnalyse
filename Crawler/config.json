@@ -1,14 +1,16 @@
 {
   "checkpointThreshold": 100,
+  "downloadImage": false,
   "genres": "a4;a46a;a46q;a47q;a4aa;a4aq;a4bq;a4ca;a4cq;a4da;a4dq;a4eq;a4ga;a4gq;a4ha;a4hq;a4ia;a4iq;a4ja;a4jq;a4ka;a4kq;a4la;a4lq;a4ma;a4mq;a4nq;a4oa;a4oq;a4pa;a4pq;a4qa;a4qq;a4ra;a4rq;a4sq;a4ta;a4tq;a4ua;a4vq;a4wa;a4wq;a4xa;a4ya;a4za;a4zq;a5aa;a5aq;a5ba;a5bq;a5ca;a5cq;a5da;a5dq;a5fa;a5fq;a5ga;a5gq;a5ka;a5lq;a5ma;a5mq;a5na;a5nq;a5pq;aa;aa3q;aa7a;aaua;ae;ai;am;aq2a;aq2q;aq3a;aq3q;aq5a;aq5q;aq6a;aq6q;aq7a;aq7q;aqaa;aqaq;aqba;aqbq;aqca;aqcq;aqda;aqdq;aqea;aqeq;aqfa;aqga;aqgq;aqha;aqhq;aqia;aqiq;aqja;aqjq;aqka;aqkq;aqla;aqlq;aqma;aqmq;aqna;aqnq;aqoa;aqoq;aqpa;aqpq;aqqa;aqqq;aqra;aqrq;aqsa;aqsq;aqta;aqtq;aqua;aquq;aqva;aqvq;aqwa;aqwq;aqxa;aqya;aqyq;aqza;aqzq;araa;araq;arba;arbq;arca;arcq;arda;ardq;area;areq;arfa;arfq;arga;argq;arha;arhq;ariq;arja;arjq;arka;arkq;arlq;arma;armq;arna;arnq;aroa;arpa;arpq;ay;ayca;aycq;ayda;ayia;ayiq;ayjq;ayla;aylq;ayma;ayna;ayoq;aypa;azaa;azba;azbq;azca;azcq;azga;azgq;b4;ba;be;bi;bm;bq;bu;by;c4;ca;ce;ci;cm;cq;cu;cy;d4;da;de;di;dm;dq;du;dy;i4;ia;ie;ii;im;iq;iu;iy;j4;ja;je;jm;jq;ju;jy;k4;ka;ke;ki;km;kq;ku;ky;l4;la;le;li;lm;lq;lu;ly;m4;ma;me;mi;mm;mq;mu;my;n4;na;ne;ni;nm;nq;nu;ny;o4;oa;oe;oi;oq;ou;oy;p4;pa;pe;pi;pm;pq;pu;py;",
+  "infoTimerInterval": 60,
   "logDir": "log",
   "logLevel": "info",
-  "maxRequestInterval": 300,
+  "maxRequestInterval": 30,
   "maxThreadCount": 128,
-  "minRequestInterval": 60,
+  "minRequestInterval": 0,
   "outputDir": "data",
-  "processorCount": 4,
-  "producerCount": 4,
+  "processorCount": 10,
+  "producerCount": 10,
   "rootUrl": "http://www.19lib.com/cn",
   "tempDir": "temp"
 }

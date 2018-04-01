@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Crawler
@@ -8,7 +7,9 @@ namespace Crawler
     public static class Config
     {
         public static int CheckpointThreshold { get; }
+        public static bool DownloadImage { get; }
         public static string Genres { get; }
+        public static int InfoTimerInterval { get; }
         public static int MaxRequestInterval { get; }
         public static int MaxThreadCount { get; }
         public static int MinRequestInterval { get; }
@@ -20,13 +21,33 @@ namespace Crawler
         public static string RootUrl { get; }
         public static string TempDir { get; }
 
+        public static void PrintConfig()
+        {
+            Logger.Info($"========== Config Start ==========");
+            Logger.Info($"CheckpointThreshold:  {CheckpointThreshold}");
+            Logger.Info($"DownloadImage:        {DownloadImage}");
+            Logger.Info($"Genres:               {Genres}");
+            Logger.Info($"InfoTimerInterval:    {InfoTimerInterval}");
+            Logger.Info($"MaxRequestInterval:   {MaxRequestInterval}");
+            Logger.Info($"MaxThreadCount:       {MaxThreadCount}");
+            Logger.Info($"MinRequestInterval:   {MinRequestInterval}");
+            Logger.Info($"LogDir:               {LogDir}");
+            Logger.Info($"LogLevel:             {LogLevel}");
+            Logger.Info($"OutputDir:            {OutputDir}");
+            Logger.Info($"ProcessorCount:       {ProcessorCount}");
+            Logger.Info($"ProducerCount:        {ProducerCount}");
+            Logger.Info($"RootUrl:              {RootUrl}");
+            Logger.Info($"TempDir:              {TempDir}");
+            Logger.Info($"==========  Config End  ==========");
+        }
+
         private static readonly string ConfigFilePath = $"config.json";
 
         static Config()
         {
             try
             {
-                var content = File.Exists(ConfigFilePath) ? File.ReadAllText(ConfigFilePath) : "{}";
+                var content = File.Exists(ConfigFilePath) ? File.ReadAllText(ConfigFilePath) : throw new Exception("No config file!");
                 var config = JObject.Parse(content);
 
                 LogDir = config["logDir"]?.Value<string>() ?? $"log";
@@ -41,6 +62,8 @@ namespace Crawler
                     throw new Exception("Missing genres in config file!");
 
                 CheckpointThreshold = config["checkpointThreshold"]?.Value<int>() ?? 100;
+                DownloadImage = config["downloadImage"]?.Value<bool>() ?? false;
+                InfoTimerInterval = config["infoTimerInterval"]?.Value<int>() ?? 60;
                 LogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), config["logLevel"]?.Value<string>() ?? "info", true);
                 ProcessorCount = config["processorCount"]?.Value<int>() ?? 4;
                 MaxRequestInterval = config["maxRequestInterval"]?.Value<int>() ?? 300;
