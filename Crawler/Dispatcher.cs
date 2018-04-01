@@ -157,6 +157,7 @@ namespace Crawler
                         var genres = sessions.First();
                         var page = int.Parse(sessions.Last());
                         ProducerTaskHistory.Add(genres, page);
+                        ProducerTasks.Add((genres, page + 1));
                     }
                 }
                 catch (Exception ex)
