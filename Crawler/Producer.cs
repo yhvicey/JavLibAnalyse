@@ -25,19 +25,13 @@ namespace Crawler
                 // Get video list
                 var videosNode = root?.GetChildElement("//*[@class='videos']");
                 if (videosNode == null)
-                {
-                    Dispatcher.FinishProducerTask(genres, page);
                     return true;
-                }
                 var videoList = videosNode?.GetChildElements("div[@class='video']")
                     ?.Select(node => node.GetAttributeValue("id", null))
                     ?.Where(id => id != null)
                     ?.Select(id => id.Remove(0, 4));
                 if (videoList == null)
-                {
-                    Dispatcher.FinishProducerTask(genres, page);
                     return true;
-                }
                 foreach (var id in videoList)
                     Dispatcher.AddProcessorTask(id);
 
