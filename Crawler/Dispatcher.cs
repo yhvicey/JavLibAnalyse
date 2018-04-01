@@ -92,7 +92,10 @@ namespace Crawler
                 foreach (var record in File.ReadAllLines(checkpointFile))
                 {
                     var sessions = record.Split(",");
-                    ProducerTaskHistory.Add(sessions.First(), int.Parse(sessions.Last()));
+                    var genres = sessions.First();
+                    var page = int.Parse(sessions.Last());
+                    ProducerTaskHistory.Add(genres, page);
+                    ProducerTasks.Add((genres, page + 1));
                 }
             }
             catch (Exception ex)
