@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ "$1" = "" || "$2" = "" ]]; then
+    echo "Usage: decrypt <input path> <output path>"
+    exit
+fi
+
+cat "$1" | base64 --decode > "$2"
