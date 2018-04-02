@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -23,25 +24,35 @@ namespace MetadataMerger
                 return 1;
             }
 
+            var files = Directory.GetDirectories(dataFolder).SelectMany(dir => Directory.GetFiles(dir, "metadata.json"));
+            IEnumerable<string> GetLines()
+            {
+                var headerAppened = false;
+                foreach (var file in files)
+                {
+                    var content = File.ReadAllText(file);
+                    var metadata = JObject.Parse(content);
+                    var properties = metadata.Children<JProperty>();
+                    if (!headerAppened)
+                    {
+                        yield return string.Join('\t', properties.Select(property => property.Name));
+                        headerAppened = true;
+                    }
+
+                    yield return string.Join(
+                        '\t',
+                        properties.Select(
+                            property =>
+                            property.Value.ToString()
+                            .Replace('\t', ' ')
+                        )
+                    );
+                }
+            }
+
             try
             {
-                var files = Directory.GetDirectories(dataFolder).SelectMany(dir => Directory.GetFiles(dir, "metadata.json"));
-                var lines = files.Select(
-                    file =>
-                    {
-                        var content = File.ReadAllText(file);
-                        var metadata = JObject.Parse(content);
-                        return string.Join(
-                            '\t',
-                            metadata.Children<JProperty>()
-                            .Select(
-                                property =>
-                                property.Value.ToString()
-                                .Replace('\t', ' ')
-                            )
-                        );
-                    });
-                File.WriteAllLines(outputFile, lines);
+                File.WriteAllLines(outputFile, GetLines());
                 return 0;
             }
             catch (Exception ex)
