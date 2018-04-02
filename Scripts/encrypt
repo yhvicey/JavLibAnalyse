@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Decrypt data by using base64
+
+if [[ "$1" = "" || "$2" = "" ]]; then
+    echo "Usage: encrypt <input path> <output path>"
+    exit
+fi
+
+cat "$1" | base64 > "$2"
