@@ -17,10 +17,6 @@ namespace Crawler
             var checkpointTimer = LaunchCheckpointTimer();
             var infoTimer = LaunchInfoTimer();
 
-            foreach (var genres in Config.Genres.Split(";"))
-            {
-                Dispatcher.AddProducerTask(genres, 1);
-            }
             Logger.Info($"Launching {Config.ProducerCount} producer threads...");
             var producerTasks = LaunchThreads(Config.ProducerCount, ProducerMainProc);
             Logger.Info($"Launching {Config.ProcessorCount} processor threads...");
@@ -31,7 +27,8 @@ namespace Crawler
             Console.ReadLine();
         }
 
-        private static CancellationTokenSource _cancelTokenSource = new CancellationTokenSource();
+        private static CancellationTokenSource CancelTokenSource = new CancellationTokenSource();
+        private static DateTime LastCheckTime = DateTime.Now;
 
         private static Timer LaunchCheckpointTimer()
         {
@@ -48,12 +45,14 @@ namespace Crawler
             {
                 Dispatcher.PrintInfo();
                 if (!Dispatcher.IsComplete)
-                    return;
+                    LastCheckTime = DateTime.Now;
 
-                _cancelTokenSource.Cancel();
-                Logger.Info($"All tasks finished. Application stopped.");
+                if ((DateTime.Now - LastCheckTime).TotalSeconds <= Config.IdleTime) return;
+
+                CancelTokenSource.Cancel();
+                Logger.Info($"All tasks finished and waited for {Config.IdleTime} seconds. Application stopped.");
                 Environment.Exit(0);
-            }, null, Config.InfoTimerInterval * 1000, Config.InfoTimerInterval * 1000);
+            }, null, 0, Config.InfoTimerInterval * 1000);
         }
 
         private static IEnumerable<Task> LaunchThreads(int threadCount, Action mainProc)
@@ -67,7 +66,7 @@ namespace Crawler
         private static void ProducerMainProc()
         {
             var random = new Random(Guid.NewGuid().GetHashCode());
-            while (!_cancelTokenSource.IsCancellationRequested)
+            while (!CancelTokenSource.IsCancellationRequested)
             {
                 var (genres, page) = Dispatcher.GetProducerTask();
                 if (Dispatcher.IsProducerTaskFinished(genres, page))
@@ -82,7 +81,7 @@ namespace Crawler
         private static void ProcessorMainProc()
         {
             var random = new Random(Guid.NewGuid().GetHashCode());
-            while (!_cancelTokenSource.IsCancellationRequested)
+            while (!CancelTokenSource.IsCancellationRequested)
             {
                 var task = Dispatcher.GetProcessorTask();
                 if (Dispatcher.IsProcessorTaskFinished(task))

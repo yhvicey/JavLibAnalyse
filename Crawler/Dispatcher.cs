@@ -159,6 +159,13 @@ namespace Crawler
                     Logger.Error($"Failed to load processor task checkpoint file. File path: {producerTaskHistoryCheckpointFile}.", ex);
                 }
             }
+            else
+            {
+                foreach (var genres in Config.Genres.Split(";"))
+                {
+                    AddProducerTask(genres, 1);
+                }
+            }
         }
     }
 }

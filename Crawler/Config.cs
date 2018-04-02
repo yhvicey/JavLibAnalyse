@@ -9,6 +9,7 @@ namespace Crawler
         public static int CheckpointInterval { get; }
         public static bool DownloadImage { get; }
         public static string Genres { get; }
+        public static int IdleTime { get; }
         public static int InfoTimerInterval { get; }
         public static int MaxRequestInterval { get; }
         public static int MaxThreadCount { get; }
@@ -27,6 +28,7 @@ namespace Crawler
             Logger.Info($"CheckpointInterval:   {CheckpointInterval}");
             Logger.Info($"DownloadImage:        {DownloadImage}");
             Logger.Info($"Genres:               {Genres}");
+            Logger.Info($"IdleTime:             {IdleTime}");
             Logger.Info($"InfoTimerInterval:    {InfoTimerInterval}");
             Logger.Info($"MaxRequestInterval:   {MaxRequestInterval}");
             Logger.Info($"MaxThreadCount:       {MaxThreadCount}");
@@ -61,15 +63,16 @@ namespace Crawler
                 Genres = config["genres"]?.Value<string>() ??
                     throw new Exception("Missing genres in config file!");
 
-                CheckpointInterval = config["checkpointThreshold"]?.Value<int>() ?? 100;
+                CheckpointInterval = config["checkpointThreshold"]?.Value<int>() ?? 120;
                 DownloadImage = config["downloadImage"]?.Value<bool>() ?? false;
-                InfoTimerInterval = config["infoTimerInterval"]?.Value<int>() ?? 60;
+                IdleTime = config["idleTime"]?.Value<int>() ?? 600;
+                InfoTimerInterval = config["infoTimerInterval"]?.Value<int>() ?? 30;
                 LogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), config["logLevel"]?.Value<string>() ?? "info", true);
-                ProcessorCount = config["processorCount"]?.Value<int>() ?? 4;
-                MaxRequestInterval = config["maxRequestInterval"]?.Value<int>() ?? 300;
-                MaxThreadCount = config["maxThreadCount"]?.Value<int>() ?? 65535;
-                MinRequestInterval = config["minRequestInterval"]?.Value<int>() ?? 60;
-                ProducerCount = config["producerCount"]?.Value<int>() ?? 4;
+                ProcessorCount = config["processorCount"]?.Value<int>() ?? 10;
+                MaxRequestInterval = config["maxRequestInterval"]?.Value<int>() ?? 30;
+                MaxThreadCount = config["maxThreadCount"]?.Value<int>() ?? 128;
+                MinRequestInterval = config["minRequestInterval"]?.Value<int>() ?? 0;
+                ProducerCount = config["producerCount"]?.Value<int>() ?? 10;
                 RootUrl = config["rootUrl"]?.Value<string>() ?? "http://www.19lib.com/cn";
             }
             catch (Exception ex)
