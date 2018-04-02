@@ -68,10 +68,10 @@ namespace Crawler
                 IdleTime = config["idleTime"]?.Value<int>() ?? 600;
                 InfoTimerInterval = config["infoTimerInterval"]?.Value<int>() ?? 30;
                 LogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), config["logLevel"]?.Value<string>() ?? "info", true);
-                ProcessorCount = config["processorCount"]?.Value<int>() ?? 10;
                 MaxRequestInterval = config["maxRequestInterval"]?.Value<int>() ?? 30;
                 MaxThreadCount = config["maxThreadCount"]?.Value<int>() ?? 128;
                 MinRequestInterval = config["minRequestInterval"]?.Value<int>() ?? 0;
+                ProcessorCount = config["processorCount"]?.Value<int>() ?? 10;
                 ProducerCount = config["producerCount"]?.Value<int>() ?? 10;
                 RootUrl = config["rootUrl"]?.Value<string>() ?? "http://www.19lib.com/cn";
             }
