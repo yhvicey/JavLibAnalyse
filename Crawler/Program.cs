@@ -28,7 +28,7 @@ namespace Crawler
         }
 
         private static CancellationTokenSource CancelTokenSource = new CancellationTokenSource();
-        private static DateTime LastCheckTime = DateTime.Now;
+        private static DateTime LastUpdateTime = DateTime.Now;
 
         private static Timer LaunchCheckpointTimer()
         {
@@ -45,9 +45,9 @@ namespace Crawler
             {
                 Dispatcher.PrintInfo();
                 if (!Dispatcher.IsComplete)
-                    LastCheckTime = DateTime.Now;
+                    LastUpdateTime = DateTime.Now;
 
-                if ((DateTime.Now - LastCheckTime).TotalSeconds <= Config.IdleTime) return;
+                if ((DateTime.Now - LastUpdateTime).TotalSeconds <= Config.IdleTime) return;
 
                 CancelTokenSource.Cancel();
                 Logger.Info($"All tasks finished and waited for {Config.IdleTime} seconds. Application stopped.");
@@ -74,6 +74,7 @@ namespace Crawler
 
                 if (Producer.Produce(genres, page))
                     Logger.Info($"Producer task ({genres}, {page}) finished successfully.");
+                LastUpdateTime = DateTime.Now;
                 Thread.Sleep(random.Next(Config.MinRequestInterval * 1000, Config.MaxRequestInterval * 1000));
             }
         }
@@ -89,6 +90,7 @@ namespace Crawler
 
                 if (Processor.Process(task))
                     Logger.Info($"Processor task {task} finished successfully.");
+                LastUpdateTime = DateTime.Now;
                 Thread.Sleep(random.Next(Config.MinRequestInterval * 1000, Config.MaxRequestInterval * 1000));
             }
         }
