@@ -34,6 +34,14 @@ See [Metadata Merger](MetadataMerger/readme.md)
 
 Encrypted into base 64 string. You can use encrypt script under "Script" folder to encrypt data.
 
+```shell
+./Script/encrypt "path/to/raw/data/file" "path/to/output/file"
+```
+
 ### Decrypt
 
-Decrypted from base 64 string. You can use decrypt script under "Script" folder to encrypt data.
+Decrypted from base 64 string. You can use decrypt script under "Script" folder to decrypt data.
+
+```shell
+./Script/decrypt "path/to/encrypted/data/file" "path/to/output/file"
+```
