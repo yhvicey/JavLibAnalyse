@@ -10,7 +10,7 @@ if ([string]::IsNullOrWhiteSpace($inputPath) -or [string]::IsNullOrWhiteSpace($o
     Break;
 }
 
-$text = [System.IO.File]::ReadAllText($inputPath);
+$text = [System.IO.File]::ReadAllText($inputPath, [System.Text.Encoding]::UTF8);
 $textBytes = [System.Text.Encoding]::UTF8.GetBytes($text);
 $encryptedText = [System.Convert]::ToBase64String($textBytes);
-Add-Content -Path $outputPath -Value $encryptedText;
+[System.IO.File]::WriteAllText($outputPath, $encryptedText, [System.Text.Encoding]::UTF8);
