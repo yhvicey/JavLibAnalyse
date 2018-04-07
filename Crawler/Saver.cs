@@ -25,7 +25,7 @@ namespace Crawler
                     ["vid"] = result.VId,
                     ["title"] = result.Title,
                     ["id"] = result.Identifier,
-                    ["date"] = result.Date.ToString("yyyy-MM-dd HH:mm:ss"),
+                    ["date"] = result.Date.ToString("yyyy-MM-dd"),
                     ["length"] = result.Length,
                     ["director"] = result.Director,
                     ["maker"] = result.Maker,
