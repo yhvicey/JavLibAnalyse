@@ -8,8 +8,6 @@ namespace Crawler
 {
     public static class Dispatcher
     {
-        public static bool IsComplete => ProducerTasks.Count == 0 && ProcessorTasks.Count == 0;
-
         public static void AddProcessorTask(string id)
         {
             lock (ProcessorSyncLock)

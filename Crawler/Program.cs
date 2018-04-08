@@ -44,9 +44,6 @@ namespace Crawler
             return new Timer(state =>
             {
                 Dispatcher.PrintInfo();
-                if (!Dispatcher.IsComplete)
-                    LastUpdateTime = DateTime.Now;
-
                 if ((DateTime.Now - LastUpdateTime).TotalSeconds <= Config.IdleTime) return;
 
                 CancelTokenSource.Cancel();
